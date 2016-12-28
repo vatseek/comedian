@@ -5,11 +5,11 @@ import { HttpError } from '../errors';
 
 
 router.get('/test', function(req, res, next) {
-    User.authorize('user', 'qwerty').then(result => {
-        return res.send({route: result});
-    }).catch(err => {
-        next(err);
-    });
+    // User.authorize('userq', 'qwerty').then(user => {
+    //     return res.send({route: user});
+    // }).catch(err => {
+    //     next(err);
+    // });
 
     // User.addUser({
     //     login: 'userq',
