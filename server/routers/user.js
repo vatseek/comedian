@@ -1,28 +1,42 @@
 import {ValidationError, HttpError} from '../errors';
+import User from '../models/user';
 const express = require('express');
 const router = express.Router();
 
-router.get('/register', function(req, res) {
-    res.send({route: 'api/v1/index'});
+
+router.get('/dashboard', function(req, res, next) {
+    res.send({link: 'dashboard'});
 });
 
-router.post('/login', require('../forms/loginForm'), function(req, res, next) {
-    console.log(req.form);
-    console.log(req.form.isValid);
-
+router.get('/register', require('../forms/registerUserForm'), function(req, res) {
     if( !req.form.isValid ){
         return next(new ValidationError(400, 'invalid params', 'json'))
     }
-    // TODO: add user
 
-    res.send({result: 'success', data: 'test'});
+    // TODO: add new user
 });
 
-/**
- * Generate users
- * @function /api/v1/users/logout/
- */
-router.get('/users/logout', function(req, res) {
+router.all('/login', require('../forms/loginForm'), function(req, res, next) {
+    if (req.session && req.session.user) {
+        res.redirect('/dashboard')
+    }
+
+    if (req.method === 'POST') {
+        if( !req.form.isValid ){
+            return next(new ValidationError(400, 'invalid params', 'json'))
+        }
+        User.authorize(req.form.login, req.form.password).then(user => {
+            res.session.user = user;
+            res.redirect('/dashboard');
+        }).catch(err => {
+            next(err);
+        })
+    } else {
+        res.render('login', {});
+    }
+});
+
+router.get('/logout', function(req, res) {
     req.session.destroy(function(err) {
         if (err) {
             return next(err);
