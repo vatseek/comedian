@@ -28,7 +28,7 @@ router.post('/post/add', postEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.get('/post/:id', postEditForm, function(req, res, next) {
+router.get('/post/:id', function(req, res, next) {
     Post.findOne({_id: req.params.id}).then(result => {
         if (!result) {
             return next(new HttpError(400, 'Not found'));
@@ -37,7 +37,7 @@ router.get('/post/:id', postEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.patch('/post/:id', function(req, res, next) {
+router.patch('/post/:id', postEditForm, function(req, res, next) {
     if ( !req.form.isValid ) {
         return next(new ValidationError(400, req.form.getErrors()), 'json');
     }
@@ -51,11 +51,9 @@ router.patch('/post/:id', function(req, res, next) {
         }
         Object.assign(post, req.form);
         post.save().then((result) => {
-            res.send({post: result});
+            return res.send({post: result});
         }).catch(err => next(err));
     }).catch(err => next(err));
-
-    res.send({test: 'test'});
 });
 
 router.delete('/post/:id', function (req, res, next) {
