@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-import Token from '../models/token'
+import Token from '../models/token';
 import { ValidationError, HttpError } from '../errors';
-import { checkAuth } from '../middlewares';
 import { tokenEditForm } from '../forms';
 
-router.get('/token/list', checkAuth, function(req, res, next) {
+router.get('/token/list', function(req, res, next) {
     const userId = req.session.user._id;
     Token.find({user: userId}).then(tokens => {
         res.send({tokens: tokens});
@@ -32,7 +31,7 @@ router.post('/token/add', tokenEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.patch('/token/:id', checkAuth, tokenEditForm, function(req, res, next) {
+router.patch('/token/:id', tokenEditForm, function(req, res, next) {
     if ( !req.form.isValid ) {
         return next(new ValidationError(400, req.form.getErrors()), 'json');
     }
@@ -47,7 +46,7 @@ router.patch('/token/:id', checkAuth, tokenEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.get('/token/:id', checkAuth, function(req, res, next) {
+router.get('/token/:id', function(req, res, next) {
     Token.findOne({_id: req.params.id}).then(token => {
         if (!token || !token.canEdit(req.session.user)) {
             return next(new HttpError(400, {'error': 'Access denied'}))

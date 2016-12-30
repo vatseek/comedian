@@ -2,8 +2,10 @@ const form = require('express-form2');
 
 
 const postForm = form(
-    form.field( 'login' ).trim().required().minLength(3),
-    form.field( 'password' ).trim().required().minLength(3)
+    form.field( 'title' ).trim().required(),
+    form.field( 'text' ).trim().required(),
+    form.field( 'tags' ).trim().required().toArray(),
+    form.field( 'published' ).trim().required()
 );
 
 export const postEditForm = postForm;

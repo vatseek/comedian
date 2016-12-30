@@ -9,18 +9,26 @@ const schema = mongoose.Schema({
     },
     title: {
         type: String,
-        unique: false,
         required: true
     },
     text: {
         type: String,
-        unique: true,
         required: true
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         unique: false,
         required: true
+    },
+    tags: {
+        type: [String],
+        required: false,
+        default: []
+    },
+    published: {
+        type: mongoose.Schema.Types.Boolean,
+        required: true,
+        default: false
     }
 });
 

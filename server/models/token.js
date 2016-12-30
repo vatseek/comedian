@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import Token from '../models/token';
+import User from '../models/user';
 
 const schema = mongoose.Schema({
     _id: {
@@ -26,7 +27,7 @@ const schema = mongoose.Schema({
 });
 
 schema.methods.canEdit = function(user) {
-    if (user._id == this.user || user.isAdmin()) {
+    if (user._id == this.user || User.isAdmin(user)) {
         return true;
     }
     return false;
