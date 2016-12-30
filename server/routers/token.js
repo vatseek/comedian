@@ -5,12 +5,6 @@ import { ValidationError, HttpError } from '../errors';
 import { checkAuth } from '../middlewares';
 import { tokenEditForm } from '../forms';
 
-const ownerHelper = function (req, res, next) {
-    if (!req.params.id || !req.session.user) {
-        next(new HttpError(406, 'Bad request'));
-    }
-};
-
 router.get('/token/list', checkAuth, function(req, res, next) {
     const userId = req.session.user._id;
     Token.find({user: userId}).then(tokens => {
@@ -38,16 +32,33 @@ router.post('/token/add', tokenEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.get('/token/:id', ownerHelper, function(req, res, next) {
-    res.send({test: req.params.id});
+router.patch('/token/:id', checkAuth, tokenEditForm, function(req, res, next) {
+    if ( !req.form.isValid ) {
+        return next(new ValidationError(400, req.form.getErrors()), 'json');
+    }
+    Token.findOne({_id: req.params.id}).then(token => {
+        if (!token || !token.canEdit(req.session.user)) {
+            return next(new HttpError(400, {'error': 'Access denied'}))
+        }
+        Object.assign(token, req.form);
+        token.save().then(result => {
+            return res.send({token: result});
+        }).catch(err => next(err));
+    }).catch(err => next(err));
 });
 
-router.patch('/token/:id', function(req, res, next) {
-    res.send({test: req.params.id});
+router.get('/token/:id', checkAuth, function(req, res, next) {
+    Token.findOne({_id: req.params.id}).then(token => {
+        if (!token || !token.canEdit(req.session.user)) {
+            return next(new HttpError(400, {'error': 'Access denied'}))
+        }
+        return res.send({token: token});
+    }).catch(err => next(err));
 });
 
 router.delete('/token/:id', function(req, res, next) {
-    res.send({test: req.params.id});
+    Token.findOne({_id: req.params.id}).remove().exec();
+    res.send({success: true});
 });
 
 module.exports = router;

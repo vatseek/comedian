@@ -25,6 +25,13 @@ const schema = mongoose.Schema({
     }
 });
 
+schema.methods.canEdit = function(user) {
+    if (user._id == this.user || user.isAdmin()) {
+        return true;
+    }
+    return false;
+};
+
 schema.statics.getByCode = function(code) {
     return Token.findOne({ token: code });
 };

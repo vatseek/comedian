@@ -68,6 +68,13 @@ schema.methods.checkPassword = function(password) {
     return this.encryptPassword(password) === this.hashedPassword;
 };
 
+schema.methods.isAdmin = function() {
+    if (this.login === 'admin') {
+        return true;
+    }
+    return false;
+};
+
 schema.statics.addUser = (data) => {
     const user = new User({...data});
     return new Promise((resolve, reject) => {
