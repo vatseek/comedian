@@ -5,7 +5,7 @@ const express = require('express');
 const router = express.Router();
 
 router.get('/dashboard', checkAuth.default, function(req, res, next) {
-    res.render('dashboard', {});
+    return res.render('dashboard', {});
 });
 
 router.get('/register', require('../forms/registerUserForm'), function(req, res, next) {
@@ -18,7 +18,9 @@ router.get('/register', require('../forms/registerUserForm'), function(req, res,
 
 router.all('/login', require('../forms/loginForm'), function(req, res, next) {
     if (req.session && req.session.user) {
-        res.redirect('/dashboard')
+        return res.return(null, null, '/dashboard', () => {
+            return next(new ValidationError(400, 'Already signed in'));
+        });
     }
 
     if (req.method === 'POST') {
@@ -27,7 +29,7 @@ router.all('/login', require('../forms/loginForm'), function(req, res, next) {
         }
         User.authorize(req.form.login, req.form.password).then(user => {
             req.session.user = user;
-            res.redirect('/dashboard');
+            return res.return(user, 'login', '/dashboard');
         }).catch(err => {
             next(err);
         })
