@@ -28,16 +28,43 @@ router.post('/post/add', postEditForm, function(req, res, next) {
     }).catch(err => next(err));
 });
 
-router.get('/post/:id', function(req, res, next) {
-    res.send({test: 'test'});
+router.get('/post/:id', postEditForm, function(req, res, next) {
+    Post.findOne({_id: req.params.id}).then(result => {
+        if (!result) {
+            return next(new HttpError(400, 'Not found'));
+        }
+        return res.send({post: result});
+    }).catch(err => next(err));
 });
 
 router.patch('/post/:id', function(req, res, next) {
+    if ( !req.form.isValid ) {
+        return next(new ValidationError(400, req.form.getErrors()), 'json');
+    }
+
+    Post.findOne({_id: req.params.id}).then(post => {
+        if (!post || !post.canEdit(req.session.user)) {
+            return next(new HttpError(400, 'Not found'));
+        }
+        if (!User.isAdmin(req.session.user)) {
+            delete(req.form.published);
+        }
+        Object.assign(post, req.form);
+        post.save().then((result) => {
+            res.send({post: result});
+        }).catch(err => next(err));
+    }).catch(err => next(err));
+
     res.send({test: 'test'});
 });
 
-router.delete('/post/:id', function(req, res, next) {
-    res.send({test: 'test'});
+router.delete('/post/:id', function (req, res, next) {
+    if (!User.isAdmin(req.session.user)) {
+        return next(new HttpError(400, {"error": "Access denied"}, 'json'));
+    }
+    Post.findOneAndRemove({ _id: req.params.id }).then(() => {
+        return res.send({success: true});
+    }).catch(err => next(err));
 });
 
 module.exports = router;

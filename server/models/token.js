@@ -23,6 +23,10 @@ const schema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         unique: false,
         required: true
+    },
+    created: {
+        type: Date,
+        default: Date.now
     }
 });
 
