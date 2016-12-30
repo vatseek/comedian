@@ -56,7 +56,7 @@ schema.statics.authorize = function(username, password) {
                 if (user && user.checkPassword(password)) {
                     resolve(user);
                 }
-                reject(new AuthError('Invalid user'));
+                reject(new AuthError(400, 'Invalid user'));
             }, error => {
                 reject(error);
             }
@@ -99,8 +99,8 @@ const User = mongoose.model('user', schema);
 export default User;
 
 class UserAuthError extends ExtError {
-    constructor(m) {
-        super(m);
+    constructor(code, message) {
+        super(code, message);
     }
 }
 
