@@ -11,6 +11,7 @@ const MongoStore = require('connect-mongo')(session);
 import router from 'routers/index';
 
 const app = express();
+app.use(express.static('public'));
 app.engine('ejs', engine);
 app.set('views', path.join(__dirname, 'templates'));
 app.set('view engine', 'ejs');

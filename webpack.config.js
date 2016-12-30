@@ -16,7 +16,7 @@ var plugins = [
             NODE_ENV: JSON.stringify(process.env.NODE_ENV || 'development')
         }
     }),
-    new ExtractTextPlugin(cssName)
+    new ExtractTextPlugin('[name].' + cssName)
 ];
 
 if (process.env.NODE_ENV === 'production') {
@@ -34,7 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 module.exports = {
     entry: {
         client: ['babel-polyfill', './src/client.js'],
-        server: ''
+        server: './server/styles/index.js'
     },
     debug: process.env.NODE_ENV !== 'production',
     resolve: {
@@ -45,7 +45,7 @@ module.exports = {
     plugins,
     output: {
         path: `${__dirname}/public/assets/`,
-        filename: jsName,
+        filename: '[name].' + jsName,
         publicPath
     },
     module: {

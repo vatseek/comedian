@@ -1,14 +1,14 @@
 import {ValidationError, HttpError} from '../errors';
+const checkAuth = require('../middlewares/checkAuth');
 import User from '../models/user';
 const express = require('express');
 const router = express.Router();
 
-
-router.get('/dashboard', function(req, res, next) {
-    res.send({link: 'dashboard'});
+router.get('/dashboard', checkAuth.default, function(req, res, next) {
+    res.render('dashboard', {});
 });
 
-router.get('/register', require('../forms/registerUserForm'), function(req, res) {
+router.get('/register', require('../forms/registerUserForm'), function(req, res, next) {
     if( !req.form.isValid ){
         return next(new ValidationError(400, 'invalid params', 'json'))
     }
@@ -23,10 +23,10 @@ router.all('/login', require('../forms/loginForm'), function(req, res, next) {
 
     if (req.method === 'POST') {
         if( !req.form.isValid ){
-            return next(new ValidationError(400, 'invalid params', 'json'))
+            return next(new ValidationError(400, 'invalid params'))
         }
         User.authorize(req.form.login, req.form.password).then(user => {
-            res.session.user = user;
+            req.session.user = user;
             res.redirect('/dashboard');
         }).catch(err => {
             next(err);
@@ -41,7 +41,7 @@ router.get('/logout', function(req, res) {
         if (err) {
             return next(err);
         }
-        res.send({result: 'success'});
+        res.redirect('/');
     });
 });
 
