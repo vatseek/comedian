@@ -79,6 +79,15 @@ schema.statics.addUser = (data) => {
     });
 };
 
+schema.statics.getUserByEmailOrLogin = function(email, login) {
+    return User.findOne({
+        $or: [
+            { email: email },
+            { login: login }
+        ]
+    })
+};
+
 const User = mongoose.model('user', schema);
 export default User;
 
