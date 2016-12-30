@@ -1,10 +1,10 @@
 import {ValidationError, HttpError} from '../errors';
-const checkAuth = require('../middlewares/checkAuth');
+import { checkAuth } from '../middlewares';
 import User from '../models/user';
 const express = require('express');
 const router = express.Router();
 
-router.get('/dashboard', checkAuth.default, function(req, res, next) {
+router.get('/dashboard', checkAuth, function(req, res, next) {
     return res.render('dashboard', {});
 });
 

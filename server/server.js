@@ -45,6 +45,7 @@ app.use(function(err, req, res, next) {
     }
     res.status(err.status || 500);
     if (res.req.headers['x-request-with'] == 'XMLHttpRequest' || err.responseType === 'json') {
+        delete(result.message);
         res.json(result);
     } else {
         res.render('error', {...result});
