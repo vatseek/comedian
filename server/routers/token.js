@@ -18,7 +18,7 @@ router.post('/token/add', tokenEditForm, function(req, res, next) {
 
     Token.getByCode(req.form.token).then(tokenData => {
         if (tokenData) {
-            return next(new HttpError(400, {'error': 'Already exists'}));
+            return next(new HttpError(400, {'error': 'Already exists'}, 'json'));
         }
         const token = new Token({
             ...req.form,
@@ -37,7 +37,7 @@ router.patch('/token/:id', tokenEditForm, function(req, res, next) {
     }
     Token.findOne({_id: req.params.id}).then(token => {
         if (!token || !token.canEdit(req.session.user)) {
-            return next(new HttpError(400, {'error': 'Access denied'}))
+            return next(new HttpError(400, {'error': 'Access denied'}, 'json'))
         }
         Object.assign(token, req.form);
         token.save().then(result => {
