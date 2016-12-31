@@ -24,10 +24,20 @@ const schema = mongoose.Schema({
         unique: false,
         required: true
     },
+    bot: {
+        type: String,
+        unique: false,
+        required: true
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         unique: false,
         required: true
+    },
+    disabled: {
+        type: mongoose.Schema.Types.Boolean,
+        required: true,
+        default: false
     },
     created: {
         type: Date,

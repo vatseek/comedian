@@ -9,6 +9,9 @@ import { mongoDb } from 'storage';
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 import router from 'routers/index';
+import Token from './models/token';
+import Application from 'engine';
+const botEngine = new Application(config.get('serviceTick'));
 
 const app = express();
 app.use(express.static('public'));
@@ -28,6 +31,10 @@ app.use(session({
 }));
 app.use(require('middlewares/loadUser'));
 app.use(require('middlewares/extendRequest'));
+app.use(function(req, res, next) {
+    req.bot = botEngine;
+    next();
+});
 
 app.use('/', router);
 app.use(function(req, res, next) {
@@ -36,6 +43,7 @@ app.use(function(req, res, next) {
     next(err);
 });
 app.use(function(err, req, res, next) {
+    // return next(err);
     const result = {
         message: err.message,
         error: {}
@@ -52,11 +60,15 @@ app.use(function(err, req, res, next) {
     }
 });
 
-
 const PORT = process.env.PORT || 3000;
 const server = app.listen(PORT, () => {
     const host = '127.0.0.1';
-    console.log("Example app listening at http://%s:%s", host, PORT)
+    console.log("Example app listening at http://%s:%s", host, PORT);
+    // Run bot service
+    Token.find({disabled: false}).then((tokens) => {
+        botEngine.loadData(tokens);
+        botEngine.start();
+    });
 });
 
 module.exports = server;

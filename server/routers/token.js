@@ -26,6 +26,7 @@ router.post('/token/add', tokenEditForm, function(req, res, next) {
         });
 
         token.save().then(token => {
+            req.bot.addToken(token);
             res.send({token: token});
         }).catch(err => next(err));
     }).catch(err => next(err));
@@ -41,6 +42,10 @@ router.patch('/token/:id', tokenEditForm, function(req, res, next) {
         }
         Object.assign(token, req.form);
         token.save().then(result => {
+            req.bot.removeTokenById(req.params.id);
+            if (!result.disabled) {
+                req.bot.addToken(result);
+            }
             return res.send({token: result});
         }).catch(err => next(err));
     }).catch(err => next(err));
@@ -57,6 +62,7 @@ router.get('/token/:id', function(req, res, next) {
 
 router.delete('/token/:id', function(req, res, next) {
     Token.findOne({_id: req.params.id}).remove().exec();
+    req.bot.removeTokenById(req.params.id);
     res.send({success: true});
 });
 
