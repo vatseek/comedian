@@ -34,7 +34,10 @@ const configDev = {
             "db": "heroku_app32398519"
         }
     },
-    "serviceTick": 5000
+    "serviceTick": 5000,
+    "telegram": {
+        "token": "289831525:AAHOgpMzp2FU6nsQRcnmbgEZXoX1IOdpUrU"
+    }
 };
 
 nconf.argv().env();
